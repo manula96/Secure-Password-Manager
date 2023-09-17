@@ -51,20 +51,20 @@ public class Client {
         int port = 22500;
         //System.setProperty("javax.net.debug", "all");
         System.setProperty("javax.net.ssl.trustStore", "Certs/truststore.jks");
-        System.setProperty("javax.net.ssl.trustStorePassword", "Seng6250");
+        System.setProperty("javax.net.ssl.trustStorePassword", Variables.Password);
         KeyStore clientKeyStore = KeyStore.getInstance("PKCS12");
-        clientKeyStore.load(ClassLoader.getSystemResourceAsStream("Certs/Client.pfx"), "Seng6250".toCharArray());
+        clientKeyStore.load(ClassLoader.getSystemResourceAsStream("Certs/Client.pfx"), Variables.Password.toCharArray());
 
         // Initialize the KeyManagerFactory with the client's key store
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        keyManagerFactory.init(clientKeyStore, "Seng6250".toCharArray());
+        keyManagerFactory.init(clientKeyStore, Variables.Password.toCharArray());
 
         // Create an SSL context with a custom TrustManager
         SSLContext sslContext = SSLContext.getInstance("SSL");
 
         // Load the CA certificate
         KeyStore trustStore = KeyStore.getInstance("PKCS12");
-        char[] trustStorePassword = "Seng6250".toCharArray();
+        char[] trustStorePassword = Variables.Password.toCharArray();
         trustStore.load(ClassLoader.getSystemResourceAsStream("Certs/Barry.p12"), trustStorePassword);
         //trustStore.load(ClassLoader.getSystemResourceAsStream("Certs/truststore.jks"), trustStorePassword);
 
@@ -84,12 +84,8 @@ public class Client {
         // Create an SSL socket factory
         SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
-
         try {
-
-                //Socket socket = new Socket(hostname, port);
-
-
+            //Socket socket = new Socket(hostname, port);
             Scanner scanner = new Scanner(System.in);
             boolean end = false;
             // Display options to the user
@@ -139,7 +135,7 @@ public class Client {
 
                     } else {
                         System.out.println("Invalid 'store' command format. Please follow the format: store <website> <password>");
-                        continue;
+                        
                     }
 
 
@@ -166,7 +162,6 @@ public class Client {
 
                     } else {
                         System.out.println("Invalid 'get' command format. Please follow the format: get <website>");
-                        continue;
                     }
                 } else if (userInput.equals("end")) {
                     // Send the "end" command to the server

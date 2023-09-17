@@ -113,7 +113,7 @@ public class Server {
     private static SSLServerSocket serverSocket;
     public static void main(String[] args) throws CertificateException, IOException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyStoreException, KeyManagementException {
         System.setProperty("javax.net.ssl.trustStore", "Certs/truststore.jks");
-        System.setProperty("javax.net.ssl.trustStorePassword", "Seng6250");
+        System.setProperty("javax.net.ssl.trustStorePassword", Variables.Password);
 
 
         String hostname = "localhost";
@@ -121,10 +121,10 @@ public class Server {
         boolean end = false;
 
         KeyStore serverKeyStore = KeyStore.getInstance("PKCS12");
-        serverKeyStore.load(ClassLoader.getSystemResourceAsStream("Certs/Server.pfx"), "Seng6250".toCharArray());
+        serverKeyStore.load(ClassLoader.getSystemResourceAsStream("Certs/Server.pfx"), Variables.Password.toCharArray());
 
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        keyManagerFactory.init(serverKeyStore, "Seng6250".toCharArray());
+        keyManagerFactory.init(serverKeyStore, Variables.Password.toCharArray());
 
         SSLContext sslContext = SSLContext.getInstance("SSL");
         sslContext.init(keyManagerFactory.getKeyManagers(), null, new java.security.SecureRandom());
