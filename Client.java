@@ -39,7 +39,7 @@ public class Client {
             baos.write(buffer, 0, in.read(buffer));  // Receive a message from the server
             return buffer;
         } catch (Exception e) {
-            // TODO: Add some better error handling
+            System.err.println("An error occurred: " + e.getMessage());
             e.printStackTrace();
         }
         return null;
@@ -68,11 +68,9 @@ public class Client {
         trustStore.load(ClassLoader.getSystemResourceAsStream("Certs/Barry.p12"), trustStorePassword);
         //trustStore.load(ClassLoader.getSystemResourceAsStream("Certs/truststore.jks"), trustStorePassword);
 
-
         // Create a TrustManagerFactory for the CA trust store
         TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         trustManagerFactory.init(trustStore);
-
 
         // Initialize the SSL context with the client's key and trust managers
         sslContext.init(
@@ -96,26 +94,25 @@ public class Client {
 
 
             while (!end) {
-
-
                 // Create an SSL socket
                 SSLSocket socket = (SSLSocket) sslSocketFactory.createSocket(hostname, port);
-                // Authenticate with the server using the client certificate and private key
-                socket.startHandshake();
-
-                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-                DataInputStream in = new DataInputStream(socket.getInputStream());
+                //System.out.println("Checkpoint 6");
 
                 System.out.print(">>> "); // Display the prompt
-
                 String userInput = scanner.nextLine().trim(); // Read user input
 
                 if (userInput.startsWith("store ")) {
                     String[] parts = userInput.split(" ");
                     if (parts.length == 3) {
+                        // Authenticate with the server using the client certificate and private key
+                        socket.startHandshake();
+
+                        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+                        DataInputStream in = new DataInputStream(socket.getInputStream());
+
                         // Send the user's command to the server
                         out.write(userInput.getBytes());
-                        //out.flush(); // Make sure the data is sent immediately
+                        out.flush(); // Make sure the data is sent immediately
 
                         // Receive and display the server's response
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -128,23 +125,26 @@ public class Client {
                             break; // Read until there is no more data available
                         }
                     }
-
-
                     String response = new String(baos.toByteArray(), 0, baos.size());
                     System.out.println(response);
 
                     } else {
                         System.out.println("Invalid 'store' command format. Please follow the format: store <website> <password>");
-                        
                     }
 
 
                 } else if (userInput.startsWith("get ")) {
                     String[] parts = userInput.split(" ");
                     if (parts.length == 2) {
+                        // Authenticate with the server using the client certificate and private key
+                        socket.startHandshake();
+
+                        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+                        DataInputStream in = new DataInputStream(socket.getInputStream());
+
                         // Send the user's command to the server
                         out.write(userInput.getBytes());
-                        //out.flush(); // Make sure the data is sent immediately
+                        out.flush(); // Make sure the data is sent immediately
 
                         // Receive and display the server's response
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -164,9 +164,15 @@ public class Client {
                         System.out.println("Invalid 'get' command format. Please follow the format: get <website>");
                     }
                 } else if (userInput.equals("end")) {
+                    // Authenticate with the server using the client certificate and private key
+                    socket.startHandshake();
+
+                    DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+                    DataInputStream in = new DataInputStream(socket.getInputStream());
+
                     // Send the "end" command to the server
                     out.write(userInput.getBytes());
-                    //out.flush(); // Make sure the data is sent immediately
+                    out.flush(); // Make sure the data is sent immediately
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     byte buffer[] = new byte[1024];
 
@@ -183,7 +189,6 @@ public class Client {
                 }
                 else {
                     System.out.println("Invalid command. Please follow the format: store/get/end");
-
                 }
             }
 

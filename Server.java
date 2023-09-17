@@ -10,6 +10,7 @@ import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -52,7 +53,6 @@ public class Server {
             DataInputStream in = new DataInputStream(conn.getInputStream())
         ) {
             boolean end = false;
-
             String message = new String(data);
             if (message.startsWith("store")) {
                 String[] parts = message.split(" ");
@@ -155,10 +155,13 @@ public class Server {
                     // If it's an X.509 certificate, you can cast it for further inspection
                     if (certificate instanceof X509Certificate) {
                         X509Certificate x509Certificate = (X509Certificate) certificate;
+                        // Check if the certificate is expired
+                        boolean isExpired = isCertificateExpired(x509Certificate);
 
                         // Check the issuer's name to verify it's issued by the CA with the name "Barry"
                         String issuerName = x509Certificate.getIssuerX500Principal().getName();
-                        if (!issuerName.contains("CN=BarryCA")) {
+                        boolean isIssuerValid = issuerName.contains("CN=BarryCA");
+                        if (!isIssuerValid || isExpired) {
                             // Certificate is NOT trusted
                             socket.close();
                             System.out.println("\n*** CA not trusted ***");
@@ -187,6 +190,18 @@ public class Server {
         } catch (Exception e) {
             System.err.println("An error occurred: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+    private static boolean isCertificateExpired(X509Certificate certificate) {
+        try {
+            Date currentDate = new Date();
+
+            // Check if the certificate is expired by comparing the current date with the certificate's notAfter date
+            certificate.checkValidity(currentDate);
+
+            return false;
+        } catch (Exception e) {
+            return true;
         }
     }
 }
